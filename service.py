@@ -2,10 +2,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import cv2
 import numpy as np
-import io
 from PIL import Image
 import dlib
-import os
+
 # Ładowanie modelu do detekcji punktów twarzy
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_81_face_landmarks.dat")
@@ -127,7 +126,8 @@ def predict_face_shape(landmarks):
         else:
             return "oval"
 
-def predict_skin_tone():
+def predict_skin_tone(eye_color, hair_color):
+    # if(eye_color == "")
     return "summer"
 
 app = Flask(__name__)
