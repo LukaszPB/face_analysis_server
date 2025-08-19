@@ -3,5 +3,5 @@ Flask-Cors==4.0.1
 numpy==1.26.4
 opencv-python-headless==4.10.0.84
 Pillow==10.4.0
-dlib==19.24.2
+dlib==19.24.1
 gunicorn==23.0.0
