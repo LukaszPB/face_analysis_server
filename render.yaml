@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: face-analyzer
+    env: python
+    region: frankfurt   # możesz zmienić np. na oregon
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
