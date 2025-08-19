@@ -6,7 +6,7 @@ opencv-python-headless==4.10.0.84
 Pillow==10.4.0
 
 # zamiast zwykłego dlib, dodaj prekompilowany wheel
-dlib==19.24.1 --find-links https://github.com/davisking/dlib/releases
+https://github.com/davisking/dlib/releases/download/v19.24/dlib-19.24.1-cp310-cp310-manylinux2014_x86_64.whl
 
 gunicorn==23.0.0
 Werkzeug>=3.0.0
