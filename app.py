@@ -175,7 +175,7 @@ def process_image():
         eye_color = predict_eye_color(landmarks, image_hsv)
         hair_color = predict_hair_color(landmarks, image_hsv)
         face_shape = predict_face_shape(landmarks)
-        skin_tone = predict_skin_tone()
+        skin_tone = predict_skin_tone(eye_color, hair_color)
 
         traits = {
             "eye_color": eye_color,
