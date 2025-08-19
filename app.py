@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import dlib
 import logging
+import sys
 
 # Ładowanie modelu do detekcji punktów twarzy
 detector = dlib.get_frontal_face_detector()
@@ -134,20 +135,28 @@ def predict_skin_tone(eye_color, hair_color):
 app = Flask(__name__)
 CORS(app)
 
+# Konfiguracja loggera raz, przy starcie
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 @app.route('/process-image', methods=['POST'])
 def process_image():
     try:
-
-        logging.info("Received request: %s", request)
+        logger.info("Received request with files: %s", request.files.keys())
 
         if 'image' not in request.files:
+            logger.warning("No image file provided")
             return {"error": "No image file provided"}, 400
 
         file = request.files['image']
         image = Image.open(file.stream).convert("RGB")
+        logger.info("Image opened successfully")
 
         image_np = np.array(image)
-
         image_hsv = cv2.cvtColor(image_np, cv2.COLOR_RGB2HSV)
         image_gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
 
@@ -155,8 +164,10 @@ def process_image():
         faces = detector(image_gray)
 
         if len(faces) == 0:
+            logger.warning("Face not detected")
             return {"error": "Face not detected"}, 400
         if len(faces) > 1:
+            logger.warning("Too many faces detected: %d", len(faces))
             return {"error": f"Too many faces detected: {len(faces)}"}, 400
 
         landmarks = predictor(image_gray, faces[0])
@@ -172,10 +183,12 @@ def process_image():
             "face_shape": face_shape,
             "skin_tone": skin_tone
         }
-        print(traits)
+
+        logger.info("Traits predicted: %s", traits)
         return jsonify(traits)
+
     except Exception as e:
-        logging.exception("Error processing image")
+        logger.exception("Error processing image")
         return {"error": str(e)}, 500
 
 if __name__ == '__main__':
