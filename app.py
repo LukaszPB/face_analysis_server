@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import dlib
+import logging
 
 # Ładowanie modelu do detekcji punktów twarzy
 detector = dlib.get_frontal_face_detector()
@@ -135,40 +136,47 @@ CORS(app)
 
 @app.route('/process-image', methods=['POST'])
 def process_image():
-    if 'image' not in request.files:
-        return {"error": "No image file provided"}, 400
+    try:
 
-    file = request.files['image']
-    image = Image.open(file.stream).convert("RGB")
+        logging.info("Received request: %s", request)
 
-    image_np = np.array(image)
+        if 'image' not in request.files:
+            return {"error": "No image file provided"}, 400
 
-    image_hsv = cv2.cvtColor(image_np, cv2.COLOR_RGB2HSV)
-    image_gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
+        file = request.files['image']
+        image = Image.open(file.stream).convert("RGB")
 
-    # Wykrywanie twarzy
-    faces = detector(image_gray)
+        image_np = np.array(image)
 
-    if len(faces) == 0:
-        return {"error": "Face not detected"}, 400
-    if len(faces) > 1:
-        return {"error": f"Too many faces detected: {len(faces)}"}, 400
+        image_hsv = cv2.cvtColor(image_np, cv2.COLOR_RGB2HSV)
+        image_gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
 
-    landmarks = predictor(image_gray, faces[0])
+        # Wykrywanie twarzy
+        faces = detector(image_gray)
 
-    eye_color = predict_eye_color(landmarks, image_hsv)
-    hair_color = predict_hair_color(landmarks, image_hsv)
-    face_shape = predict_face_shape(landmarks)
-    skin_tone = predict_skin_tone()
+        if len(faces) == 0:
+            return {"error": "Face not detected"}, 400
+        if len(faces) > 1:
+            return {"error": f"Too many faces detected: {len(faces)}"}, 400
 
-    traits = {
-        "eye_color": eye_color,
-        "hair_color": hair_color,
-        "face_shape": face_shape,
-        "skin_tone": skin_tone
-    }
-    print(traits)
-    return jsonify(traits)
+        landmarks = predictor(image_gray, faces[0])
+
+        eye_color = predict_eye_color(landmarks, image_hsv)
+        hair_color = predict_hair_color(landmarks, image_hsv)
+        face_shape = predict_face_shape(landmarks)
+        skin_tone = predict_skin_tone()
+
+        traits = {
+            "eye_color": eye_color,
+            "hair_color": hair_color,
+            "face_shape": face_shape,
+            "skin_tone": skin_tone
+        }
+        print(traits)
+        return jsonify(traits)
+    except Exception as e:
+        logging.exception("Error processing image")
+        return {"error": str(e)}, 500
 
 if __name__ == '__main__':
     app.run()
