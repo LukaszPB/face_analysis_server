@@ -1,7 +1,18 @@
+# inne wymagane pakiety
 Flask==3.0.3
 Flask-Cors==4.0.1
 numpy==1.26.4
 opencv-python-headless==4.10.0.84
 Pillow==10.4.0
+
+# zamiast zwykłego dlib, dodaj prekompilowany wheel
 dlib==19.24.1 --find-links https://github.com/davisking/dlib/releases
+
 gunicorn==23.0.0
+Werkzeug>=3.0.0
+blinker>=1.6.2
+itsdangerous>=2.1.2
+Jinja2>=3.1.2
+click>=8.1.3
+packaging
+MarkupSafe>=2.0
