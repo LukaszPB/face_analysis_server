@@ -9,6 +9,8 @@ import sys
 
 # Ładowanie modelu do detekcji punktów twarzy
 detector = dlib.get_frontal_face_detector()
+
+# Ten projekt wykorzystuje 81 Facial Landmarks Shape Predictor, Copyright (c) 2019, Nikolay Feldman udostępniony na licencji BSD 3-Clause.
 predictor = dlib.shape_predictor("shape_predictor_81_face_landmarks.dat")
 
 def predict_eye_color(landmarks, image_hsv):
