@@ -176,10 +176,10 @@ def process_image():
 
         if len(faces) == 0:
             logger.warning("Face not detected")
-            return {"Face not detected"}, 400
+            return {"error": "Face not detected"}, 400
         if len(faces) > 1:
             logger.warning("Too many faces detected: %d", len(faces))
-            return {"Too many faces detected: {len(faces)}"}, 400
+            return {"error": f"Too many faces detected: {len(faces)}"}, 400
 
         landmarks = predictor(image_gray, faces[0])
 
