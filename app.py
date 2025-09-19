@@ -131,8 +131,17 @@ def predict_face_shape(landmarks):
             return "oval"
 
 def predict_skin_tone(eye_color, hair_color):
-    # if(eye_color == "")
-    return "summer"
+    if(hair_color == "black"):
+        return "winter"
+    elif((eye_color == "blue" or eye_color == "green") and hair_color == "blond"):
+        return "spring"
+    elif(eye_color == "graye" or eye_color == "blue"):
+        return "summer"
+    elif(eye_color == "brown" or eye_color == "green" or eye_color == "hazel"):
+        return "autumn"
+    else:
+        return "-"
+
 
 app = Flask(__name__)
 CORS(app)
@@ -167,10 +176,10 @@ def process_image():
 
         if len(faces) == 0:
             logger.warning("Face not detected")
-            return {"error": "Face not detected"}, 400
+            return {"Face not detected"}, 400
         if len(faces) > 1:
             logger.warning("Too many faces detected: %d", len(faces))
-            return {"error": f"Too many faces detected: {len(faces)}"}, 400
+            return {"Too many faces detected: {len(faces)}"}, 400
 
         landmarks = predictor(image_gray, faces[0])
 
