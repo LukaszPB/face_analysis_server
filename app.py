@@ -202,5 +202,9 @@ def process_image():
         logger.exception("Error processing image")
         return {"error": str(e)}, 500
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({"status": "ok", "message": "pong"}), 200
+
 if __name__ == '__main__':
     app.run()
