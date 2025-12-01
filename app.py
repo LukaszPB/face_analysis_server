@@ -6,6 +6,8 @@ from PIL import Image
 import dlib
 import logging
 import sys
+import io
+from pillow_heif import register_heif_opener
 
 # Ładowanie modelu do detekcji punktów twarzy
 detector = dlib.get_frontal_face_detector()
@@ -161,10 +163,17 @@ def process_image():
 
         if 'image' not in request.files:
             logger.warning("No image file provided")
-            return {"error": "No image file provided"}, 400
+            return jsonify({"error_code": "NO_FILE"}), 400
 
         file = request.files['image']
-        image = Image.open(file.stream).convert("RGB")
+
+        file_bytes = file.read()
+        
+        if file.filename.lower().endswith(".heic") or file.content_type == "image/heic":
+            register_heif_opener()
+            image = Image.open(io.BytesIO(file_bytes)).convert("RGB")
+        else:
+            image = Image.open(io.BytesIO(file_bytes)).convert("RGB")
         logger.info("Image opened successfully")
 
         image_np = np.array(image)
@@ -176,10 +185,10 @@ def process_image():
 
         if len(faces) == 0:
             logger.warning("Face not detected")
-            return {"error": "Face not detected"}, 400
+            return jsonify({"error_code": "NO_FACE"}), 400
         if len(faces) > 1:
             logger.warning("Too many faces detected: %d", len(faces))
-            return {"error": f"Too many faces detected: {len(faces)}"}, 400
+            return jsonify({"error_code": "TOO_MANY_FACES", "count": len(faces)}), 400
 
         landmarks = predictor(image_gray, faces[0])
 
@@ -200,7 +209,7 @@ def process_image():
 
     except Exception as e:
         logger.exception("Error processing image")
-        return {"error": str(e)}, 500
+        return jsonify({"error_code": "SERVER_ERROR", "detail": str(e)}), 500
 
 @app.route('/ping', methods=['GET'])
 def ping():
